@@ -8,11 +8,65 @@ const win = async function (config) {
     //  * extract the redirect location from the response headers
     //  * make request to the login url, providing the user/pass in the body
     //  * if ok - extract the session Id from the set-session header
-    let loginLocation = await firstRequest(config)
-    config.loginLocation = loginLocation
-    let sessionId = await secondRequest(config)
 
-    return sessionId
+
+    let initialChecksSession = await initialChecks.combined(config)
+
+    if (initialChecksSession.error) {
+        let loginLocation = await firstRequest(config)
+        config.loginLocation = loginLocation.replace(/\/$/, "");
+        let sessionId = await secondRequest(config)
+
+        helpers.session.write(sessionId)
+
+        return { error: false, message: sessionId }
+    }
+
+    return { error: false, message: initialChecksSession.message }
+}
+
+const initialChecks = {
+    savedSession: function () {
+        let sessionFileExists = helpers.session.read()
+
+        if (sessionFileExists.error) {
+            return { error: true, message: sessionFileExists.message }
+        } else {
+            return { error: false, message: sessionFileExists.message }
+        }
+    },
+    sessionIsActive: async function (config, sessionId) {
+        let checkSessionRequest = await helpers.webRequest.get({
+            url: `${config.url}/qps/user`,
+            headers: { 'Cookie': `${config.header}=${sessionId}` }
+        })
+
+        if (!checkSessionRequest.session) {
+            return { error: true, message: 'session is expired' }
+        }
+
+        if (checkSessionRequest.session == "inactive") {
+            return { error: true, message: 'session is expired' }
+        }
+
+        return { error: false, message: sessionId }
+    },
+    combined: async function (config) {
+
+        let savedSession = initialChecks.savedSession()
+
+        if (savedSession.error == true) {
+            return { error: true, message: savedSession.message }
+        }
+
+        let isSessionActive = await this.sessionIsActive(config, savedSession.message)
+
+        if (isSessionActive.error == true) {
+            return { error: true, message: isSessionActive.message }
+        }
+
+        return savedSession
+    }
 }
 
 async function firstRequest(config) {
@@ -39,6 +93,11 @@ async function secondRequest(config) {
     // generate the request option
     //  * content type should be urlencoded
     //  * use the correct xrfkey
+
+    if(!urlParams.xrfkey) {
+        urlParams.xrfkey = helpers.generateXrfkey(16)
+    }
+
     let reqOptions = {
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -54,7 +113,7 @@ async function secondRequest(config) {
 
     // make the request
     let response = await helpers.webRequest.post({
-        url: config.loginLocation,
+        url: `${config.loginLocation}?xrfkey=${urlParams.xrfkey}`,
         headers: reqOptions,
         body: queryCredentials
     })
@@ -73,8 +132,10 @@ function extractSessionId({ headers, config }) {
     // "X-Qlik-Session=f2b68d0c-e0f0-47fb-8fd6-60a95237db78; Path=/; HttpOnly; Secure"
     // as a result the function will return only: f2b68d0c-e0f0-47fb-8fd6-60a95237db78
     let cookieSessionId = headers['set-cookie'].filter(function (c) {
-        return c.indexOf(config.cookie) > -1
-    })[0].split(';')[0].split(`${config.cookie}=`)[1]
+        return c.indexOf(config.header) > -1
+    })[0].split(';')[0].split(`${config.header}=`)[1]
+
+    helpers.session.write(cookieSessionId)
 
     return cookieSessionId
 }
