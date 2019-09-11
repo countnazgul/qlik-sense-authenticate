@@ -1,0 +1,17 @@
+{
+  "name": "qlik-sense-authentication",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ajv": "^6.10.2",
+    "axios": "^0.19.0",
+    "querystring": "^0.2.0"
+  }
+}
