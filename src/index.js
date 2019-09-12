@@ -1,8 +1,11 @@
 const auth = require('./lib/authenticate');
 const logout = require('./lib/logout');
+const helpers = require('./lib/helpers')
 
 const lib = {
     login: async function (config) {
+
+        config.props.url = helpers.prepareURL(config)
 
         let isValidConfig = await validateConfig(config)
 
@@ -18,13 +21,15 @@ const lib = {
         return b
     },
     logout: async function (config) {
+        config.props.url = helpers.prepareURL(config)
         return await logout(config.props)
     }
 }
 
 async function validateConfig(config) {
 
-    let validAuthTypes = ['jwt', 'cert', 'header', 'win']
+    // let validAuthTypes = ['jwt', 'cert', 'header', 'win']
+    let validAuthTypes = ['win']
 
     if (validAuthTypes.indexOf(config.type.toLowerCase()) == -1) {
         return {

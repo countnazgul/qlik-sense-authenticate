@@ -3,6 +3,25 @@ const fs = require('fs');
 const axios = require('axios');
 const querystring = require('querystring');
 
+const extractDomain = function (config) {
+    let parsed = URL.parse(config.props.url)
+
+    return `${parsed.protocol}//${parsed.hostname}`
+}
+
+const prepareURL = function (config) {
+
+    let domain = extractDomain(config)
+
+    let readyURL = `${domain}/hub/`
+
+    if (config.props.proxy) {
+        readyURL = `${domain}/${config.props.proxy}/hub/`
+    }
+
+    return readyURL
+}
+
 const webRequest = {
     get: async function ({ url, headers }) {
 
@@ -97,5 +116,6 @@ module.exports = {
     webRequest,
     generateXrfkey,
     convertToFormData,
-    session
+    session,
+    prepareURL
 }
