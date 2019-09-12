@@ -16,13 +16,13 @@ At the end this package will support 4 authentication methods:
 ### Installation
 
 ``` 
-npm install --save qlik-sense-authentication
+npm install --save qlik-sense-authenticate
 ```
 
 Once the installation is complete the package can be included in the project:
 
 ``` javascript
-const qAuth = require('qlik-sense-authentication');
+const qAuth = require('qlik-sense-authenticate');
 ```
 
 ### Authenticatoin Methods
