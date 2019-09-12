@@ -13,13 +13,26 @@ const win = async function (config) {
     let initialChecksSession = await initialChecks.combined(config)
 
     if (initialChecksSession.error) {
+        // if there is no session file
+        // or the saved session is no longer valid
+        // start the process to get new session
         let loginLocation = await firstRequest(config)
-        config.loginLocation = loginLocation.replace(/\/$/, "");
+
+        if (loginLocation.error) {
+            return loginLocation
+        }
+
+        config.loginLocation = loginLocation.message.headers.location
+
         let sessionId = await secondRequest(config)
 
-        helpers.session.write(sessionId)
+        if (sessionId.error) {
+            return sessionId
+        }
 
-        return { error: false, message: sessionId }
+        helpers.session.write(sessionId.message)
+
+        return sessionId
     }
 
     return { error: false, message: initialChecksSession.message }
@@ -27,13 +40,7 @@ const win = async function (config) {
 
 const initialChecks = {
     savedSession: function () {
-        let sessionFileExists = helpers.session.read()
-
-        if (sessionFileExists.error) {
-            return { error: true, message: sessionFileExists.message }
-        } else {
-            return { error: false, message: sessionFileExists.message }
-        }
+        return helpers.session.read()
     },
     sessionIsActive: async function (config, sessionId) {
         let checkSessionRequest = await helpers.webRequest.get({
@@ -74,16 +81,12 @@ async function firstRequest(config) {
     // rather that its a Form authentication
     // "converting" from Windows to Form is done via the User-Agent header
     // Trying to make proper Windows request from Node is a bit of a pain ... for now
-    try {
-        let response = await helpers.webRequest.get({
-            url: config.url,
-            headers: { 'User-Agent': 'Form' }
-        })
+    let response = await helpers.webRequest.get({
+        url: config.url,
+        headers: { 'User-Agent': 'Form' }
+    })
 
-        return response.headers.location
-    } catch (e) {
-        console.log(e.message)
-    }
+    return response
 }
 
 async function secondRequest(config) {
@@ -118,8 +121,16 @@ async function secondRequest(config) {
         body: queryCredentials
     })
 
+    if (response.error) {
+        return response.error
+    }
+
     // extract the session id from the response headers
-    let sessionId = extractSessionId({ headers: response.headers, config })
+    let sessionId = extractSessionId({ headers: response.message.headers, config })
+
+    if (sessionId.error) {
+        return session
+    }
 
     return sessionId
 }
@@ -131,13 +142,15 @@ function extractSessionId({ headers, config }) {
     // the returned set-cookie header is in the following format:
     // "X-Qlik-Session=f2b68d0c-e0f0-47fb-8fd6-60a95237db78; Path=/; HttpOnly; Secure"
     // as a result the function will return only: f2b68d0c-e0f0-47fb-8fd6-60a95237db78
-    let cookieSessionId = headers['set-cookie'].filter(function (c) {
-        return c.indexOf(config.header) > -1
-    })[0].split(';')[0].split(`${config.header}=`)[1]
+    try {
+        let cookieSessionId = headers['set-cookie'].filter(function (c) {
+            return c.indexOf(config.header) > -1
+        })[0].split(';')[0].split(`${config.header}=`)[1]
 
-    helpers.session.write(cookieSessionId)
-
-    return cookieSessionId
+        return { error: false, message: cookieSessionId }
+    } catch (e) {
+        return { error: true, message: e.message }
+    }
 }
 
 module.exports = async function (config) {

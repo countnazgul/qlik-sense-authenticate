@@ -5,40 +5,43 @@ const helpers = require('./lib/helpers')
 const lib = {
     login: async function (config) {
 
-        config.props.url = helpers.prepareURL(config)
-
+        // check if the config obj is containing all the required keys
         let isValidConfig = await validateConfig(config)
 
-        if (isValidConfig.isValid == false) {
-            return {
-                error: true,
-                message: isValidConfig.message
-            }
+        if (isValidConfig.error) {
+            return isValidConfig
         }
 
-        let b = await auth(config)
+        // normalise the url - limt the troubles ahead
+        config.props.url = helpers.prepareURL(config)
 
-        return b
+        // check for header if not set the default one
+        config.props.header = helpers.prepareHeader(config)
+        
+        let response = await auth(config)
+
+        return response
     },
     logout: async function (config) {
         config.props.url = helpers.prepareURL(config)
+        config.props.header = helpers.prepareHeader(config)
         return await logout(config.props)
     }
 }
 
 async function validateConfig(config) {
 
-    // let validAuthTypes = ['jwt', 'cert', 'header', 'win']
+    //'jwt', 'cert', 'header' -> to follow
     let validAuthTypes = ['win']
 
     if (validAuthTypes.indexOf(config.type.toLowerCase()) == -1) {
         return {
-            isValid: false,
+            error: true,
             message: `No valid authentication type found. Valid values: ${validAuthTypes.join(',')}`
         }
     }
 
-    return { isValid: true }
+    return { error: false, message: 'Config looks valid' }
 }
 
 module.exports = lib

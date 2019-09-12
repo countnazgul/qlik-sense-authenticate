@@ -1,6 +1,6 @@
 {
-  "name": "@countnazgul/qlik-sense-authentication",
-  "version": "0.0.3",
+  "name": "qlik-sense-authentication",
+  "version": "0.0.4",
   "description": "Qlik Sense helper package that simplifies the authentication communication",
   "author": "Stefan Stoichev <@countnazgul> (https://sstoichev.eu)",
   "main": "./src/index.js",

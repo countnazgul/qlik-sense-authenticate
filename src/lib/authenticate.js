@@ -1,4 +1,4 @@
-const jwt = require('./auth/jwt');
+// const jwt = require('./auth/jwt');
 const win = require('./auth/windows');
 
 const doAuthenticate = async function (config) {
@@ -11,7 +11,10 @@ const doAuthenticate = async function (config) {
         return await win(config.props)
     }
 
-    return { error: 'The provided authentication type do no exists or its not supported' }
+    return {
+        error: true,
+        message: 'The provided authentication type do no exists or its not supported'
+    }
 
 }
 

@@ -22,6 +22,15 @@ const prepareURL = function (config) {
     return readyURL
 }
 
+const prepareHeader = function (config) {
+
+    if (config.props.header) {
+        return config.props.headers
+    }
+
+    return 'X-Qlik-Session'
+}
+
 const webRequest = {
     get: async function ({ url, headers }) {
 
@@ -47,12 +56,12 @@ const webRequest = {
             if (response.status == 301) {
                 let newResponse = await axios.get(`${response.headers.location}`, properties)
 
-                return newResponse
+                return { error: false, message: newResponse }
             }
 
-            return response
+            return { error: false, message: response }
         } catch (e) {
-            console.log(e.message)
+            return { error: true, message: e.message }
         }
 
     },
@@ -61,9 +70,9 @@ const webRequest = {
         try {
             let response = await axios.post(url, body, headers)
 
-            return response
+            return { error: false, message: response }
         } catch (e) {
-            let a = 1
+            return { error: true, message: e.message }
         }
     },
     delete: async function ({ url, headers }) {
@@ -92,7 +101,15 @@ const session = {
     read: function () {
 
         if (fs.existsSync("./session.txt")) {
-            return { error: false, message: fs.readFileSync('./session.txt').toString() }
+            let readString = fs.readFileSync('./session.txt').toString()
+
+            let isValidGUID = session.validate(readString)
+
+            if (isValidGUID.error) {
+                return isValidGUID
+            }
+
+            return { error: false, message: readString }
         }
 
         return { error: true, message: 'sessions file not found' }
@@ -109,6 +126,15 @@ const session = {
         fs.writeFileSync('./session.txt', sessionId)
 
         return { error: false, message: 'session id was saved' }
+    },
+    validate: function (sessionId) {
+        let pattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+        if (!pattern.test(sessionId)) {
+            return { error: true, message: 'loaded string do NOT looks like session id' }
+        }
+
+        return { error: false, message: 'loaded string looks like session id' }
     }
 }
 
@@ -117,5 +143,6 @@ module.exports = {
     generateXrfkey,
     convertToFormData,
     session,
-    prepareURL
+    prepareURL,
+    prepareHeader
 }

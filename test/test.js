@@ -15,7 +15,7 @@ const qAuth = require('../src/index');
         }
     }
 
-    // let sessionId = await qAuth.login(config)
-    let logout = await qAuth.logout(config)
+    let sessionId = await qAuth.login(config)
+    // let logout = await qAuth.logout(config)
     let a = 1
 })()
