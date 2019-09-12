@@ -25,17 +25,27 @@ const webRequest = {
         try {
             let response = await axios.get(`${url}`, properties)
 
+            if (response.status == 301) {
+                let newResponse = await axios.get(`${response.headers.location}`, properties)
+
+                return newResponse
+            }
+
             return response
         } catch (e) {
-            let a = 1
+            console.log(e.message)
         }
 
     },
     post: async function ({ url, headers, body }) {
 
-        let response = await axios.post(url, body, headers)
+        try {
+            let response = await axios.post(url, body, headers)
 
-        return response
+            return response
+        } catch (e) {
+            let a = 1
+        }
     }
 }
 

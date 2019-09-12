@@ -11,7 +11,7 @@ const qAuth = require('../src/index');
             url: process.env.URL,
             username: process.env.USER,
             password: process.env.PASSWORD,
-            header: 'X-Qlik-Session'
+            header: process.env.HEADER
         }
     }
 

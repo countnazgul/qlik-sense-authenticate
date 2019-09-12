@@ -3,7 +3,7 @@ const url = require('url');
 
 const win = async function (config) {
     // Windows/Form authentication is few steps process
-    // which at the end returns session Id:
+    // which at the end returns session Id (if authentication is successful):
     //  * navigate to the main page and stops the redirect 
     //  * extract the redirect location from the response headers
     //  * make request to the login url, providing the user/pass in the body
@@ -41,11 +41,11 @@ const initialChecks = {
             headers: { 'Cookie': `${config.header}=${sessionId}` }
         })
 
-        if (!checkSessionRequest.session) {
-            return { error: true, message: 'session is expired' }
-        }
+        // if (!checkSessionRequest.data.session) {
+        //     return { error: true, message: 'session is expired' }
+        // }
 
-        if (checkSessionRequest.session == "inactive") {
+        if (checkSessionRequest.data.session == "inactive") {
             return { error: true, message: 'session is expired' }
         }
 
@@ -94,7 +94,7 @@ async function secondRequest(config) {
     //  * content type should be urlencoded
     //  * use the correct xrfkey
 
-    if(!urlParams.xrfkey) {
+    if (!urlParams.xrfkey) {
         urlParams.xrfkey = helpers.generateXrfkey(16)
     }
 
@@ -113,7 +113,7 @@ async function secondRequest(config) {
 
     // make the request
     let response = await helpers.webRequest.post({
-        url: `${config.loginLocation}?xrfkey=${urlParams.xrfkey}`,
+        url: `${config.loginLocation}`,
         headers: reqOptions,
         body: queryCredentials
     })
