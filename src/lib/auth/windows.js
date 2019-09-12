@@ -44,7 +44,7 @@ const initialChecks = {
     },
     sessionIsActive: async function (config, sessionId) {
         let checkSessionRequest = await helpers.webRequest.get({
-            url: `${config.url}/qps/user`,
+            url: `${config.url.replace('/hub/', '')}/qps/user`,
             headers: { 'Cookie': `${config.header}=${sessionId}` }
         })
 
@@ -52,7 +52,7 @@ const initialChecks = {
         //     return { error: true, message: 'session is expired' }
         // }
 
-        if (checkSessionRequest.data.session == "inactive") {
+        if (checkSessionRequest.message.data.session == "inactive") {
             return { error: true, message: 'session is expired' }
         }
 

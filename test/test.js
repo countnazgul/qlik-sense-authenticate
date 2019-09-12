@@ -17,5 +17,5 @@ const qAuth = require('../src/index');
 
     let sessionId = await qAuth.login(config)
     // let logout = await qAuth.logout(config)
-    let a = 1
+    console.log(sessionId)
 })()
