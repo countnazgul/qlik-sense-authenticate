@@ -46,6 +46,15 @@ const webRequest = {
         } catch (e) {
             let a = 1
         }
+    },
+    delete: async function ({ url, headers }) {
+        try {
+            await axios.delete(url, headers)
+        } catch (e) {
+
+        }
+
+        return { error: false, message: 'session.txt was deleted or was not exist' }
     }
 }
 

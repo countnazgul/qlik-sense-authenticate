@@ -1,12 +1,12 @@
 require('dotenv').config()
 
 const qAuth = require('../src/index');
+// const qAuth = require('../src/index-test');
 
 (async function () {
 
     let config = {
         type: 'win',
-        saveSession: true,
         props: {
             url: process.env.URL,
             username: process.env.USER,
@@ -15,7 +15,9 @@ const qAuth = require('../src/index');
         }
     }
 
-    let sessionId = await qAuth(config)
-
+    // let sessionId = await qAuth.login(config)
+    let logout = await qAuth.logout(config)
+    // qAuth.func1(config); // Hallo David
+    // qAuth.func2(config); // Goodbye David
     let a = 1
 })()

@@ -1,19 +1,25 @@
 const auth = require('./lib/authenticate');
+const logout = require('./lib/logout');
 
-const lib = async function (config) {
+const lib = {
+    login: async function (config) {
 
-    let isValidConfig = await validateConfig(config)
+        let isValidConfig = await validateConfig(config)
 
-    if (isValidConfig.isValid == false) {
-        return {
-            error: true,
-            message: isValidConfig.message
+        if (isValidConfig.isValid == false) {
+            return {
+                error: true,
+                message: isValidConfig.message
+            }
         }
+
+        let b = await auth(config)
+
+        return b
+    },
+    logout: async function (config) {
+        return await logout(config.props)
     }
-
-    let b = await auth(config)
-
-    return b
 }
 
 async function validateConfig(config) {
@@ -30,6 +36,4 @@ async function validateConfig(config) {
     return { isValid: true }
 }
 
-module.exports = async function (config) {
-    return await lib(config)
-}
+module.exports = lib
