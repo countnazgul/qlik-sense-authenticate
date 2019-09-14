@@ -122,35 +122,25 @@ async function secondRequest(config) {
     })
 
     if (response.error) {
+        
         return response.error
     }
 
+
+    // if there is a response but there is no cookie
+    // the the authentication was not successful - wrong user/pass
+    if(!response.message.headers['set-cookie']) {
+        return {error: true, message: 'Authentication failed. Wrong username and/or password?'}
+    }
+
     // extract the session id from the response headers
-    let sessionId = extractSessionId({ headers: response.message.headers, config })
+    let sessionId = helpers.extractSessionId({ headers: response.message.headers, config })
 
     if (sessionId.error) {
-        return session
+        return sessionId
     }
 
     return sessionId
-}
-
-function extractSessionId({ headers, config }) {
-    // filter the set-cookie headers
-    // and find the one that have the cookie header (passed from the main config)
-    // once the header is found then extract and return only the session ID
-    // the returned set-cookie header is in the following format:
-    // "X-Qlik-Session=f2b68d0c-e0f0-47fb-8fd6-60a95237db78; Path=/; HttpOnly; Secure"
-    // as a result the function will return only: f2b68d0c-e0f0-47fb-8fd6-60a95237db78
-    try {
-        let cookieSessionId = headers['set-cookie'].filter(function (c) {
-            return c.indexOf(config.header) > -1
-        })[0].split(';')[0].split(`${config.header}=`)[1]
-
-        return { error: false, message: cookieSessionId }
-    } catch (e) {
-        return { error: true, message: e.message }
-    }
 }
 
 module.exports = async function (config) {

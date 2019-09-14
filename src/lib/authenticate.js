@@ -1,4 +1,5 @@
 // const jwt = require('./auth/jwt');
+const header = require('./auth//header');
 const win = require('./auth/windows');
 
 const doAuthenticate = async function (config) {
@@ -9,6 +10,10 @@ const doAuthenticate = async function (config) {
 
     if (config.type.toLowerCase() == 'win') {
         return await win(config.props)
+    }
+
+    if (config.type.toLowerCase() == 'header') {
+        return await header(config.props)
     }
 
     return {

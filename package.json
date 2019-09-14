@@ -1,6 +1,6 @@
 {
   "name": "qlik-sense-authenticate",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "description": "Qlik Sense helper package that simplifies the authentication communication",
   "author": "Stefan Stoichev <@countnazgul> (https://sstoichev.eu)",
   "main": "./src/index.js",
@@ -23,7 +23,9 @@
     "querystring": "^0.2.0"
   },
   "devDependencies": {
-    "dotenv": "^8.1.0"
+    "dotenv": "^8.1.0",
+    "enigma.js": "^2.4.0",
+    "ws": "^7.1.2"
   },
   "engines": {
     "node": ">=8"

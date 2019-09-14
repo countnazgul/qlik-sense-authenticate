@@ -2,7 +2,7 @@
 
 ## Under development!
 
-This package will simplify (or at least this is the idea) of authenticating agains Qlik Sense. If the authentication is successful the result will be `session id` which can be used is the request that will follow.
+This package will simplify (or at least this is the idea) of authenticating against Qlik Sense. If the authentication is successful the result will be `session id` which can be used is the request that will follow.
 
 At the end this package will support 4 authentication methods:
 
@@ -11,7 +11,7 @@ At the end this package will support 4 authentication methods:
 * JWT
 * Windows/Form
 
-**At the moment only Winows/Form is available (and need more testing. Please do not use for production!)**
+**At the moment only Windows/Form is available (and need more testing. Please do not use for production!)**
 
 ### Installation
 
@@ -25,7 +25,7 @@ Once the installation is complete the package can be included in the project:
 const qAuth = require('qlik-sense-authenticate');
 ```
 
-### Authenticatoin Methods
+### Authentication Methods
 
 **Windows/Form usage**
 
@@ -36,7 +36,7 @@ const qAuth = require('qlik-sense-authenticate');
         props: {
             url: 'https://my-qlik-sense-server',
             proxy: '(optional) if not the default Virtual Proxy is used',
-            username: 'doman\username OR .\username',
+            username: 'domain\\username OR .\\username',
             password: 'my-password',
             header: '(optional) it will default to X-Qlik-Session'
         }
@@ -54,7 +54,7 @@ The returned session can be passed as a `Cookie` on any other request which comm
 
 On each successful authentication the package will store the session id in `session.txt` file in the current directory. 
 
-Also on each use, the package will read this file (if exists) and using the sesson will check against Qlik Sense if the session is still active. If its not - will authenticate and generate new one (using the config object)
+Also on each use, the package will read this file (if exists) and using the session will check against Qlik Sense if the session is still active. If its not - will authenticate and generate new one (using the config object)
 
 ### Logout
 
