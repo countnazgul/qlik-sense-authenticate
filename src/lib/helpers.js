@@ -25,7 +25,7 @@ const prepareURL = function (config) {
 const prepareHeader = function (config) {
 
     if (config.props.header) {
-        return config.props.headers
+        return config.props.header
     }
 
     return 'X-Qlik-Session'
@@ -138,11 +138,30 @@ const session = {
     }
 }
 
+const extractSessionId = function ({ headers, config }) {
+    // filter the set-cookie headers
+    // and find the one that have the cookie header (passed from the main config)
+    // once the header is found then extract and return only the session ID
+    // the returned set-cookie header is in the following format:
+    // "X-Qlik-Session=f2b68d0c-e0f0-47fb-8fd6-60a95237db78; Path=/; HttpOnly; Secure"
+    // as a result the function will return only: f2b68d0c-e0f0-47fb-8fd6-60a95237db78
+    try {
+        let cookieSessionId = headers['set-cookie'].filter(function (c) {
+            return c.indexOf(config.header) > -1
+        })[0].split(';')[0].split(`${config.header}=`)[1]
+
+        return { error: false, message: cookieSessionId }
+    } catch (e) {
+        return { error: true, message: e.message }
+    }
+}
+
 module.exports = {
     webRequest,
     generateXrfkey,
     convertToFormData,
     session,
     prepareURL,
-    prepareHeader
+    prepareHeader,
+    extractSessionId
 }

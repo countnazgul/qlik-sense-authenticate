@@ -12,7 +12,7 @@ const lib = {
             return isValidConfig
         }
 
-        // normalise the url - limt the troubles ahead
+        // normalize the url - limit the troubles ahead
         config.props.url = helpers.prepareURL(config)
 
         // check for header if not set the default one
@@ -32,7 +32,7 @@ const lib = {
 async function validateConfig(config) {
 
     //'jwt', 'cert', 'header' -> to follow
-    let validAuthTypes = ['win']
+    let validAuthTypes = ['win', 'header']
 
     if (validAuthTypes.indexOf(config.type.toLowerCase()) == -1) {
         return {
