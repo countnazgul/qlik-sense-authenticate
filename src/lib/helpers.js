@@ -150,6 +150,10 @@ const extractSessionId = function ({ headers, config }) {
             return c.indexOf(config.header) > -1
         })[0].split(';')[0].split(`${config.header}=`)[1]
 
+        // if (cookieSessionId.indexOf(':') > -1) {
+        //     cookieSessionId = cookieSessionId.split(':')[0].replace('{', '').replace('}', '')
+        // }
+
         return { error: false, message: cookieSessionId }
     } catch (e) {
         return { error: true, message: e.message }

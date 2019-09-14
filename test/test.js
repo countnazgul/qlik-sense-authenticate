@@ -1,15 +1,15 @@
-require('dotenv').config()
+require('dotenv').config({ path: './.env_win' })
+require('dotenv').config({ path: './.env_header' })
 
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 const qAuth = require('../src/index');
+
 const enigma = require('enigma.js');
 const WebSocket = require('ws');
 const schema = require('enigma.js/schemas/12.20.0.json');
 
-
 (async function () {
-
     let config = {
         win: {
             type: 'win',
@@ -36,11 +36,11 @@ const schema = require('enigma.js/schemas/12.20.0.json');
 
     let sessionId = await qAuth.login(config.header)
 
-    console.log(sessionId)
-
-    await engineTest(sessionId.message)
-
-    // let logout = await qAuth.logout(config)    
+    try {
+        let docList = await engineTest(sessionId.message)
+    } catch (e) {
+        console.log(e.message)
+    }
 })()
 
 const engineTest = async function (sessionId) {
@@ -49,7 +49,7 @@ const engineTest = async function (sessionId) {
         url: `wss://${process.env.QLIK_URL_ENGINE}/app/engineData`,
         createSocket: url => new WebSocket(url, {
             headers: {
-                Cookie: `${process.env.QLIK_HEADER}=${sessionId.message}`
+                Cookie: `${process.env.QLIK_HEADER}=${sessionId}`
             }
         }),
     });
@@ -58,14 +58,11 @@ const engineTest = async function (sessionId) {
         console.log('received:', data)
     });
 
-    try {
-        let global = await session.open()
-        let docList = await global.getDocList()
+    let global = await session.open()
+    let docList = await global.getDocList()
 
-        console.log(docList)
+    await session.close()
 
-        await session.close()
-    } catch (e) {
-        let a = 1
-    }
-}
+    return docList
+};
+
