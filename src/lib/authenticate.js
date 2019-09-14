@@ -1,4 +1,4 @@
-// const jwt = require('./auth/jwt');
+const jwt = require('./auth/jwt');
 const header = require('./auth//header');
 const win = require('./auth/windows');
 

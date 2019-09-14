@@ -59,6 +59,7 @@ typings/
 .env
 .env_header
 .env_win
+.env_jwt
 
 # next.js build output
 .next
