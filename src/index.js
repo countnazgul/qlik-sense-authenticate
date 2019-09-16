@@ -31,7 +31,6 @@ const lib = {
 
 async function validateConfig(config) {
 
-    // 'cert' -> to follow
     let validAuthTypes = ['win', 'header', 'jwt']
 
     if (validAuthTypes.indexOf(config.type.toLowerCase()) == -1) {

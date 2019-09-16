@@ -1,3 +1,7 @@
+certificates/
+*.pem
+*.pfx
+*.cer
 # Logs
 logs
 *.log
@@ -60,6 +64,7 @@ typings/
 .env_header
 .env_win
 .env_jwt
+.env_cert
 
 # next.js build output
 .next

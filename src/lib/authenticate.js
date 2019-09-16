@@ -23,7 +23,6 @@ const doAuthenticate = async function (config) {
 
 }
 
-
 module.exports = async function (config) {
     return await doAuthenticate(config)
 }

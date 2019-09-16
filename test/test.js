@@ -48,6 +48,7 @@ const schema = require('enigma.js/schemas/12.20.0.json');
 
     try {
         let docList = await engineTest(sessionId.message)
+        console.log(docList)
     } catch (e) {
         console.log(e.message)
     }
