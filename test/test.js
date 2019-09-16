@@ -1,5 +1,6 @@
-require('dotenv').config({ path: './.env_win' })
-require('dotenv').config({ path: './.env_header' })
+// require('dotenv').config({ path: './.env_win' })
+// require('dotenv').config({ path: './.env_header' })
+require('dotenv').config({ path: './.env_jwt' })
 
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
@@ -31,13 +32,23 @@ const schema = require('enigma.js/schemas/12.20.0.json');
                 header: process.env.QLIK_HEADER,
                 header_auth: process.env.QLIK_HEADER_AUTH
             }
+        },
+        jwt: {
+            type: 'jwt',
+            props: {
+                url: process.env.QLIK_URL,
+                proxy: process.env.QLIK_PROXY,
+                header: process.env.QLIK_HEADER,
+                token: process.env.QLIK_TOKEN
+            }
         }
     }
 
-    let sessionId = await qAuth.login(config.header)
+    let sessionId = await qAuth.login(config.jwt)
 
     try {
         let docList = await engineTest(sessionId.message)
+        console.log(docList)
     } catch (e) {
         console.log(e.message)
     }

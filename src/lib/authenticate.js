@@ -1,4 +1,4 @@
-// const jwt = require('./auth/jwt');
+const jwt = require('./auth/jwt');
 const header = require('./auth//header');
 const win = require('./auth/windows');
 
@@ -22,7 +22,6 @@ const doAuthenticate = async function (config) {
     }
 
 }
-
 
 module.exports = async function (config) {
     return await doAuthenticate(config)

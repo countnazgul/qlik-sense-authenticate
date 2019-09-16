@@ -17,7 +17,7 @@ const lib = {
 
         // check for header if not set the default one
         config.props.header = helpers.prepareHeader(config)
-        
+
         let response = await auth(config)
 
         return response
@@ -31,8 +31,7 @@ const lib = {
 
 async function validateConfig(config) {
 
-    //'jwt', 'cert', 'header' -> to follow
-    let validAuthTypes = ['win', 'header']
+    let validAuthTypes = ['win', 'header', 'jwt']
 
     if (validAuthTypes.indexOf(config.type.toLowerCase()) == -1) {
         return {
