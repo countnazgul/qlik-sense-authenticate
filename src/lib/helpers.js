@@ -149,11 +149,31 @@ const extractSessionId = function ({ headers, config }) {
   // the returned set-cookie header is in the following format:
   // "X-Qlik-Session=f2b68d0c-e0f0-47fb-8fd6-60a95237db78; Path=/; HttpOnly; Secure"
   // as a result the function will return only: f2b68d0c-e0f0-47fb-8fd6-60a95237db78
+
+  if (!headers["set-cookie"])
+    return {
+      error: true,
+      message: `No cookies returned. Wrong credentials?`,
+    };
+
+  if (headers["set-cookie"].length == 0)
+    return {
+      error: true,
+      message: `There is no cookie for "${config.header}" header. Wrong session header value?`,
+    };
+
   try {
-    const cookieSessionId = headers["set-cookie"]
-      .filter(function (c) {
-        return c.indexOf(config.header) > -1;
-      })[0]
+    const sessionCookie = headers["set-cookie"].filter(function (c) {
+      return c.indexOf(config.header) > -1;
+    });
+
+    if (sessionCookie.length == 0)
+      return {
+        error: true,
+        message: `There is no sessionID for "${config.header}" header. Wrong session header value?`,
+      };
+
+    const cookieSessionId = sessionCookie[0]
       .split(";")[0]
       .split(`${config.header}=`)[1];
 
