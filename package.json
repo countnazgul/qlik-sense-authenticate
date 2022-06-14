@@ -3,7 +3,7 @@
   "version": "0.1.10",
   "description": "Qlik Sense helper package that simplifies the authentication communication",
   "author": "Stefan Stoichev <@countnazgul> (https://sstoichev.eu)",
-  "main": "./src/index.js",
+  "main": "./dist/index.js",
   "homepage": "https://github.com/countnazgul/qlik-sense-authenticate",
   "repository": {
     "type": "git",
