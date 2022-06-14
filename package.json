@@ -1,6 +1,6 @@
 {
   "name": "qlik-sense-authenticate",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Qlik Sense helper package that simplifies the authentication communication",
   "author": "Stefan Stoichev <@countnazgul> (https://sstoichev.eu)",
   "main": "./src/index.js",
@@ -10,7 +10,7 @@
     "url": "https://github.com/countnazgul/qlik-sense-authenticate.git"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rollup -c"
   },
   "keywords": [
     "qlik",
@@ -23,11 +23,14 @@
     "querystring": "^0.2.0"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^22.0.0",
     "dotenv": "^16.0.1",
     "enigma.js": "^2.9.0",
+    "rollup": "^2.75.6",
+    "rollup-plugin-delete": "^2.0.0",
     "ws": "^8.8.0"
   },
   "engines": {
-    "node": ">=8"
+    "node": ">=12.20"
   }
 }
