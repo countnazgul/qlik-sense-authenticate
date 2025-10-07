@@ -94,11 +94,9 @@ async function secondRequest(config) {
 
   if (!urlParams.xrfkey) urlParams.xrfkey = helpers.generateXrfkey(16);
 
-  const reqOptions = {
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      "x-qlik-xrfkey": urlParams.xrfkey,
-    },
+  const headers = {
+    "Content-Type": "application/x-www-form-urlencoded",
+    "x-qlik-xrfkey": urlParams.xrfkey,
   };
 
   // convert the body (user and pass) to url encoded values
@@ -110,7 +108,7 @@ async function secondRequest(config) {
   // make the request
   const response = await helpers.webRequest.post({
     url: `${config.loginLocation}`,
-    headers: reqOptions,
+    headers,
     body: queryCredentials,
   });
 

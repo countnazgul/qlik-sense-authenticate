@@ -1,6 +1,8 @@
 import commonjs from "@rollup/plugin-commonjs";
 import del from "rollup-plugin-delete";
-import pkg from "./package.json";
+import resolve from "@rollup/plugin-node-resolve"
+import json from "@rollup/plugin-json"
+import terser from '@rollup/plugin-terser';
 
 export default {
   input: "src/index.js",
@@ -10,15 +12,17 @@ export default {
     sourcemap: true,
   },
   external: [
-    ...Object.keys(pkg.dependencies || {}),
-    ...Object.keys(pkg.peerDependencies || {}),
     "fs",
     "url",
+    "https"
   ],
   plugins: [
     del({
       targets: "dist/*",
     }),
+    json(),
+    resolve(),
     commonjs(),
+    terser()
   ],
 };

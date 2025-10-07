@@ -1,16 +1,23 @@
 const URL = require("url");
 const fs = require("fs");
 const axios = require("axios");
-const querystring = require("querystring");
+const https = require("https");
+
+const instance = axios.create({
+  httpsAgent: new https.Agent({
+    rejectUnauthorized: false,
+    keepAlive: false
+  })
+});
 
 const extractDomain = function (config) {
-  let parsed = URL.parse(config.props.url);
+  const parsed = URL.parse(config.props.url, true);
 
   return `${parsed.protocol}//${parsed.hostname}`;
 };
 
 const prepareURL = function (config) {
-  let domain = extractDomain(config);
+  const domain = extractDomain(config);
 
   let readyURL = `${domain}/hub/`;
 
@@ -33,7 +40,7 @@ const webRequest = {
   get: async function ({ url, headers }) {
     var url_parts = URL.parse(url, true);
 
-    let xrfkey = generateXrfkey(16);
+    const xrfkey = generateXrfkey(16);
 
     headers["x-qlik-xrfkey"] = xrfkey;
 
@@ -41,20 +48,23 @@ const webRequest = {
       url = `${url}?xrfkey=${xrfkey}`;
     }
 
-    let properties = {
-      headers: headers,
-      maxRedirects: 0,
-      validateStatus: null,
-    };
-
     try {
-      let response = await axios.get(`${url}`, properties);
+      const response = await instance({
+        method: "get",
+        url,
+        headers,
+        maxRedirects: 0,
+        validateStatus: null
+      })
 
       if (response.status == 301) {
-        let newResponse = await axios.get(
-          `${response.headers.location}`,
-          properties
-        );
+        const newResponse = await instance({
+          method: "get",
+          url: response.headers.location,
+          headers,
+          maxRedirects: 0,
+          validateStatus: null
+        })
 
         return { error: false, message: newResponse };
       }
@@ -66,7 +76,12 @@ const webRequest = {
   },
   post: async function ({ url, headers, body }) {
     try {
-      let response = await axios.post(url, body, headers);
+      const response = await instance({
+        method: "post",
+        url,
+        headers,
+        data: body
+      })
 
       return { error: false, message: response };
     } catch (e) {
@@ -75,8 +90,12 @@ const webRequest = {
   },
   delete: async function ({ url, headers }) {
     try {
-      await axios.delete(url, headers);
-    } catch (e) {}
+      await instance({
+        method: "delete",
+        url,
+        headers
+      })
+    } catch (e) { }
 
     return {
       error: false,
@@ -92,18 +111,18 @@ const generateXrfkey = function (length) {
 };
 
 const convertToFormData = function ({ username, password }) {
-  return querystring.stringify({
-    username: username,
-    pwd: password,
-  });
+  const p = new URLSearchParams()
+  p.append("username", username)
+  p.append("pwd", password)
+  return p.toString()
 };
 
 const session = {
   read: function () {
     if (fs.existsSync("./session.txt")) {
-      let readString = fs.readFileSync("./session.txt").toString();
+      const readString = fs.readFileSync("./session.txt").toString();
 
-      let isValidGUID = session.validate(readString);
+      const isValidGUID = session.validate(readString);
 
       if (isValidGUID.error) {
         return isValidGUID;
